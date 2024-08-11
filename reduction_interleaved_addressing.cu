@@ -20,6 +20,10 @@ __global__ void reduce_v0(int *g_idata, int *g_odata) {
         if (tid % (2 * s) == 0) { // 检查当前线程是否是每组2s个线程的第一个，如果是，则执行规约操作
             sdata[tid] += sdata[tid + s]; // 将当前线程的共享内存的值与它右侧第s个位置的值相加，实现规约
         }
+        int index = 2 * s * tid;
+        if (index < blockDim.x) {
+            sdata[index] += sdata[index + s];
+        }
         __syncthreads();
     }
 

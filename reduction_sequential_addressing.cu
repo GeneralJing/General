@@ -16,9 +16,9 @@ __global__ void reduce_v0(int *g_idata, int *g_odata) {
     __syncthreads(); // 确保所有线程都完成了上一步的加载数据操作
 
     // do reduction in shared mem
-    for (unsigned int s = 1; s < blockDim.x; s *= 2) {
-        if (tid % (2 * s) == 0) { // 检查当前线程是否是每组2s个线程的第一个，如果是，则执行规约操作
-            sdata[tid] += sdata[tid + s]; // 将当前线程的共享内存的值与它右侧第s个位置的值相加，实现规约
+    for (unsigned int s = blockDim.x/2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
         }
         __syncthreads();
     }
